@@ -1,30 +1,67 @@
-def task3():
-    # Исходные множества друзей
-    friends_A = {"Иван", "Мария", "Петр", "Анна", "Сергей"}
-    friends_B = {"Петр", "Анна", "Елена", "Дмитрий", "Сергей"}
+def task4():
+    # Исходные данные
+    A = {'Москва', 'Тула', 'Рязань', 'Калуга'}
+    B = {'Рязань', 'Владимир', 'Калуга', 'Тверь'}
+    C = {'Москва', 'Тверь', 'Смоленск', 'Рязань'}
+    ALL = {'Москва', 'Тула', 'Рязань', 'Калуга', 'Владимир', 'Тверь', 'Смоленск'}
 
-    print("Множество A:", friends_A)
-    print("Множество B:", friends_B)
+    print("Компания A обслуживает:", sorted(A))
+    print("Компания B обслуживает:", sorted(B))
+    print("Компания C обслуживает:", sorted(C))
+    print("Все районы страны:", sorted(ALL))
     print()
 
-    # 1. Общие друщи
-    common_friends = friends_A & friends_B
-    print("Общие друзья:", sorted(common_friends))
+    # 1. Районы, где есть хотя бы две компании
+    districts_two_or_more = set()
 
-    # 2. Уникальные друзья каждого пользователя
-    unique_to_A = friends_A - friends_B
-    unique_to_B = friends_B - friends_A
-    print("\nУникальные друзья A:", sorted(unique_to_A))
-    print("Уникальные друзья B:", sorted(unique_to_B))
+    # Проверяем каждый район
+    for district in ALL:
+        count = 0
+        if district in A:
+            count += 1
+        if district in B:
+            count += 1
+        if district in C:
+            count += 1
 
-    # 3. Все знакомые (объединение)
-    all_friends = friends_A | friends_B
-    print("\nВсе знакомые:", sorted(all_friends))
+        if count >= 2:
+            districts_two_or_more.add(district)
 
-    # Дополнительно: симметрическая разность
-    symmetric_diff = friends_A ^ friends_B
-    print("Друзья, которые есть только у одного пользователя:", sorted(symmetric_diff))
+    print("1. Районы с хотя бы двумя компаниями:", sorted(districts_two_or_more))
+
+    # 2. Районы, где работает только одна компания
+    districts_one_company = set()
+
+    for district in ALL:
+        count = 0
+        if district in A:
+            count += 1
+        if district in B:
+            count += 1
+        if district in C:
+            count += 1
+
+        if count == 1:
+            districts_one_company.add(district)
+
+    print("2. Районы с одной компанией:", sorted(districts_one_company))
+
+    # 3. Проверка покрытия всех районов
+    all_covered = A | B | C
+    print("\n3. Все районы, покрытые компаниями:", sorted(all_covered))
+
+    if all_covered == ALL:
+        print("✓ Все районы страны покрыты хотя бы одной компанией")
+    else:
+        uncovered = ALL - all_covered
+        print(f"✗ Не покрыты районы: {sorted(uncovered)}")
+
+    # Дополнительно: районы, которые не обслуживаются вообще
+    if len(ALL - all_covered) > 0:
+        print(f"Необслуживаемые районы: {sorted(ALL - all_covered)}")
+    else:
+        print("Все районы обслуживаются хотя бы одной компанией")
 
 
 if __name__ == "__main__":
-    task3()
+    task4()

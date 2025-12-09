@@ -1,53 +1,51 @@
 def task2():
-    print("Введите строки (пустая строка для завершения):")
-
-    def transform_string(s):
-        """Функция преобразования строки по правилам автомата"""
+    # Функция для преобразования строки по правилам
+    def transform(s):
         while True:
-            original = s
-
-            # Заменяем по порядку согласно условию
             if '111' in s:
-                s = s.replace('111', '0', 1)  # Замена первых слева трех единиц
+                # Заменяем первые три единицы на ноль
+                s = s.replace('111', '0', 1)
             elif '000' in s:
-                s = s.replace('000', '1', 1)  # Замена первых слева трех нулей
+                # Заменяем первые три нуля на единицу
+                s = s.replace('000', '1', 1)
             elif '001' in s:
-                s = s.replace('001', '1', 1)  # Замена 001 на 1
+                # Заменяем 001 на 1
+                s = s.replace('001', '1', 1)
             elif '100' in s:
-                s = s.replace('100', '1', 1)  # Замена 100 на 1
+                # Заменяем 100 на 1
+                s = s.replace('100', '1', 1)
             elif '00' in s:
-                s = s.replace('00', '0', 1)  # Замена 00 на 0
+                # Заменяем 00 на 0
+                s = s.replace('00', '0', 1)
             else:
-                break  # Если ни одно условие не выполнилось
-
-            # Если строка не изменилась, выходим
-            if s == original:
+                # Если ничего не нашли - выходим
                 break
-
         return s
 
-    # Считываем строки до пустой строки
-    input_strings = []
+    # Вводим строки
+    print("Введите строки из 0 и 1 (пустая строка - завершить):")
+    strings = []
+
     while True:
         s = input().strip()
         if s == "":
             break
         # Проверяем, что строка состоит только из 0 и 1
-        if all(char in '01' for char in s):
-            input_strings.append(s)
-        else:
-            print("Строка должна содержать только 0 и 1!")
+        if all(c in '01' for c in s):
+            strings.append(s)
 
     # Преобразуем все строки
-    transformed_strings = [transform_string(s) for s in input_strings]
+    results = []
+    for s in strings:
+        results.append(transform(s))
 
-    # Используем множество для получения уникальных строк
-    unique_strings = set(transformed_strings)
+    # Находим уникальные результаты
+    unique_results = set(results)
 
-    # Выводим результат
-    print(f"\nКоличество различных строк: {len(unique_strings)}")
+    # Выводим ответ
+    print(f"\nКоличество различных строк: {len(unique_results)}")
     print("Полученные строки:")
-    for s in sorted(unique_strings):
+    for s in sorted(unique_results):
         print(s)
 
 
