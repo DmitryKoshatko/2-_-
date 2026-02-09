@@ -1,5 +1,39 @@
+from collections import defaultdict
+
+
+class EquipmentManager:
+    def __init__(self, inventory):
+        self.inventory = inventory.copy()
+        self.issued = defaultdict(list)
+
+    def issue(self, student, item, quantity=1, min_required=0):
+        """Выдать оборудование студенту"""
+        if item not in self.inventory:
+            print(f"Оборудование '{item}' не найдено")
+            return False
+
+        available = self.inventory[item]
+        if available - quantity < min_required:
+            print(f"Недостаточно '{item}'. Доступно: {available}, требуется: {quantity}")
+            return False
+
+        # Выдача
+        self.inventory[item] -= quantity
+        self.issued[student].extend([item] * quantity)
+        print(f"Выдано студенту {student}: {quantity} шт. '{item}'")
+        return True
+
+    def print_status(self):
+        print("\nТекущий инвентарь:")
+        for item, count in self.inventory.items():
+            print(f"  {item}: {count} шт.")
+
+        print("\nВыданное оборудование:")
+        for student, items in self.issued.items():
+            print(f"  {student}: {', '.join(items)}")
+
+
 def task2():
-    # Исходный инвентарь
     inventory = {
         "Микроскоп": 5,
         "Пробирки": 20,
@@ -8,68 +42,23 @@ def task2():
         "Реактивы": 10
     }
 
-    # Словарь для учета выданного оборудования
-    issued_items = {}
+    manager = EquipmentManager(inventory)
 
-    def issue_equipment(student, item, quantity=1, min_required=1):
-        """
-        Функция для выдачи оборудования
-
-        Параметры:
-        student - имя студента
-        item - название оборудования
-        quantity - количество для выдачи (по умолчанию 1)
-        min_required - минимальное количество, которое должно остаться
-        """
-
-        # Проверяем наличие оборудования
-        if item not in inventory:
-            print(f"Оборудование '{item}' не найдено в инвентаре")
-            return False
-
-        # Проверяем, достаточно ли оборудования
-        if inventory[item] - quantity < min_required:
-            print(f"Недостаточно оборудования '{item}' для выдачи")
-            print(f"Доступно: {inventory[item]}, требуется: {quantity}")
-            return False
-
-        # Уменьшаем количество в инвентаре
-        inventory[item] -= quantity
-
-        # Добавляем в учет выданного
-        if student not in issued_items:
-            issued_items[student] = []
-
-        # Добавляем оборудование в список выданного студенту
-        for _ in range(quantity):
-            issued_items[student].append(item)
-
-        print(f"Выдано студенту {student}: {quantity} шт. '{item}'")
-        return True
-
-    # Демонстрация работы
     print("Начальный инвентарь:")
     for item, count in inventory.items():
         print(f"  {item}: {count} шт.")
+
+    # Выдача оборудования
+    manager.issue("Иван", "Микроскоп")
+    manager.issue("Мария", "Пробирки", 3)
+    manager.issue("Петр", "Весы")
+    manager.issue("Анна", "Колбы", 2)
+
+    # Неудачная попытка
     print()
+    manager.issue("Сергей", "Весы", 3, min_required=1)
 
-    # Примеры выдачи
-    issue_equipment("Иван", "Микроскоп")
-    issue_equipment("Мария", "Пробирки", 3)
-    issue_equipment("Петр", "Весы")
-    issue_equipment("Анна", "Колбы", 2)
-
-    # Попытка выдать больше, чем есть
-    print()
-    issue_equipment("Сергей", "Весы", 3, min_required=1)
-
-    print("\nТекущий инвентарь:")
-    for item, count in inventory.items():
-        print(f"  {item}: {count} шт.")
-
-    print("\nВыданное оборудование:")
-    for student, items in issued_items.items():
-        print(f"  {student}: {', '.join(items)}")
+    manager.print_status()
 
 
 if __name__ == "__main__":

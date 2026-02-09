@@ -1,5 +1,7 @@
+from collections import defaultdict, Counter
+
+
 def task1():
-    # Исходные данные: словарь с датами и списками студентов
     attendance = {
         "2025-03-12": ["Иван", "Мария", "Петр", "Анна"],
         "2025-03-14": ["Иван", "Анна", "Сергей"],
@@ -8,41 +10,28 @@ def task1():
         "2025-03-21": ["Иван", "Петр"]
     }
 
-    print("Расписание посещений:")
-    for date, students in attendance.items():
-        print(f"{date}: {', '.join(students)}")
-    print()
+    # Все студенты
+    all_students = {student for students in attendance.values() for student in students}
 
-    # 1. Собираем всех уникальных студентов
-    all_students = set()
-    for students in attendance.values():
-        all_students.update(students)
-
-    # 2. Считаем пропуски для каждого студента
+    # Подсчет посещений
     total_classes = len(attendance)
-    attendance_stats = {}
-    absences_stats = {}
+    attendance_count = defaultdict(int)
 
-    for student in all_students:
-        attended = 0
-        for students in attendance.values():
-            if student in students:
-                attended += 1
+    for students in attendance.values():
+        for student in students:
+            attendance_count[student] += 1
 
-        attendance_stats[student] = (attended / total_classes) * 100
-        absences_stats[student] = total_classes - attended
+    # Находим студента с максимальными пропусками
+    max_absences_student = min(attendance_count, key=attendance_count.get)
+    max_absences = total_classes - attendance_count[max_absences_student]
 
-    # 3. Находим студента с наибольшим количеством пропусков
-    max_absences_student = max(absences_stats, key=absences_stats.get)
-    max_absences = absences_stats[max_absences_student]
+    print(f"1. Больше всех пропустил: {max_absences_student} ({max_absences} занятий)\n")
 
-    print(f"1. Больше всех пропустил: {max_absences_student} ({max_absences} занятий)")
-    print()
-
-    # 4. Процент посещаемости для каждого студента
+    # Процент посещаемости
     print("2. Процент посещаемости:")
-    for student in sorted(attendance_stats.keys()):
-        print(f"   {student}: {attendance_stats[student]:.1f}%")
+    for student in sorted(all_students):
+        percentage = (attendance_count[student] / total_classes) * 100
+        print(f"   {student}: {percentage:.1f}%")
 
 
 if __name__ == "__main__":

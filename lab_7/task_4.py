@@ -1,95 +1,61 @@
+def read_until_end_marker(end_marker='.'):
+    """Читает строки до маркера окончания"""
+    lines = []
+    while True:
+        line = input().strip()
+        if not line:
+            continue
+        if line.endswith(end_marker):
+            lines.append(line.rstrip(end_marker).strip())
+            break
+        lines.append(line.rstrip(';').strip())
+    return lines
+
+
 def task4():
     print("Ввод рецептов (окончание - точка):")
-
-    # Чтение рецептов
     recipes = {}
-    while True:
-        line = input().strip()
-        if line.endswith('.'):
-            # Убираем точку
-            line = line[:-1].strip()
-            if line:
-                # Разделяем название и ингредиенты
-                if ': ' in line:
-                    name, ingredients_str = line.split(': ', 1)
-                    # Разделяем ингредиенты
-                    ingredients = [ing.strip() for ing in ingredients_str.split(', ')]
-                    recipes[name] = ingredients
-            break
-        elif line.endswith(';'):
-            # Убираем точку с запятой
-            line = line[:-1].strip()
-            if line:
-                if ': ' in line:
-                    name, ingredients_str = line.split(': ', 1)
-                    ingredients = [ing.strip() for ing in ingredients_str.split(', ')]
-                    recipes[name] = ingredients
+    for line in read_until_end_marker():
+        if ': ' in line:
+            name, ingredients = line.split(': ', 1)
+            recipes[name] = [i.strip() for i in ingredients.split(', ')]
 
-    print("\nВвод продуктов в холодильнике (окончание - точка):")
-
-    # Чтение продуктов в холодильнике
+    print("\nВвод продуктов в холодильнике:")
     fridge = {}
-    while True:
-        line = input().strip()
-        if line.endswith('.'):
-            line = line[:-1].strip()
-            if line:
-                if ': ' in line:
-                    item, count_str = line.split(': ', 1)
-                    fridge[item.strip()] = int(count_str)
-            break
-        elif line.endswith(';'):
-            line = line[:-1].strip()
-            if line:
-                if ': ' in line:
-                    item, count_str = line.split(': ', 1)
-                    fridge[item.strip()] = int(count_str)
+    for line in read_until_end_marker():
+        if ': ' in line:
+            item, count = line.split(': ', 1)
+            fridge[item.strip()] = int(count)
 
-    print("\nВвод рецептов для приготовления (пустая строка - окончание):")
-
-    # Чтение рецептов для приготовления
-    dishes_to_cook = []
+    print("\nВвод блюд для приготовления (пустая строка - окончание):")
+    dishes = []
     while True:
         dish = input().strip()
         if not dish:
             break
-        dishes_to_cook.append(dish)
+        dishes.append(dish)
 
-    print("\n" + "=" * 50)
-    print("Результат:")
-    print("=" * 50)
+    print("\n" + "=" * 50 + "\nРезультат:\n" + "=" * 50)
 
-    # Приготовление блюд
-    for dish in dishes_to_cook:
+    for dish in dishes:
         if dish not in recipes:
             print(f"Рецепт '{dish}' не найден")
             continue
 
-        # Проверяем, достаточно ли ингредиентов
-        can_cook = True
-        needed_ingredients = recipes[dish]
-
-        # Создаем временную копию для проверки
-        temp_fridge = fridge.copy()
-
-        for ingredient in needed_ingredients:
-            if ingredient not in temp_fridge or temp_fridge[ingredient] == 0:
-                can_cook = False
-                break
-            temp_fridge[ingredient] -= 1
+        # Проверка возможности приготовления
+        needed = recipes[dish]
+        can_cook = all(fridge.get(ing, 0) > 0 for ing in needed)
 
         if can_cook:
-            # Приготовление возможно - обновляем холодильник
-            for ingredient in needed_ingredients:
-                fridge[ingredient] -= 1
+            for ing in needed:
+                fridge[ing] -= 1
             print(f"Готовим {dish}.")
         else:
             print(f"Приготовить {dish} не получится.")
 
-    # Выводим оставшиеся продукты
-    print("\n" + "=" * 50)
-    print("Остатки в холодильнике:")
-    for item, count in fridge.items():
+    # Остатки
+    print("\n" + "=" * 50 + "\nОстатки в холодильнике:")
+    for item, count in sorted(fridge.items()):
         if count > 0:
             print(f"  {item}: {count}")
 
